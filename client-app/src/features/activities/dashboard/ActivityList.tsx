@@ -1,17 +1,15 @@
 import React, { SyntheticEvent, useState } from 'react';
 import { Activity } from '../../../app/models/activity';
 import { Button, Item, Label, Segment } from 'semantic-ui-react';
+import { useStore } from '../../../app/stores/store';
+import { observer } from 'mobx-react-lite';
 
-interface Props {
-    activities: Activity[];
-    selectActivity: (id: string) => void;
-    deleteActivity: (id: string) => void;
-    submitting: boolean
-};
 
-export default function ActivityList({activities, selectActivity, deleteActivity, submitting}: Props)
+export default observer(function ActivityList()
 {
     const [target, setTarget] = useState('');
+    const {activityStore} = useStore();
+    const {activityByDates: activities, deleteActivity, loading} = activityStore;
 
     function activityDelete(e: SyntheticEvent<HTMLButtonElement>, id: string){
         setTarget(e.currentTarget.name);
@@ -43,13 +41,13 @@ export default function ActivityList({activities, selectActivity, deleteActivity
                                     floated='right' 
                                     content='View' 
                                     color='blue' 
-                                    onClick={() => selectActivity(activity.id)} />
+                                    onClick={() => activityStore.selectActivity(activity.id)} />
                                 <Button 
                                     name={activity.id}
                                     floated='right' 
                                     content='Delete' 
                                     color='red' 
-                                    loading={submitting && target === activity.id}
+                                    loading={loading && target === activity.id}
                                     onClick={(e) => activityDelete(e, activity.id)} />
                                 <Label basic content={activity.category} />
                             </Item.Extra>
@@ -59,4 +57,4 @@ export default function ActivityList({activities, selectActivity, deleteActivity
             </Item.Group>
         </Segment>
     );
-}
+});
